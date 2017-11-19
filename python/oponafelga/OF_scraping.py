@@ -1,4 +1,5 @@
 # coding: utf-8
+# sciaganie danych z oponafelga.pl
 
 import pandas as pd
 import numpy as np
