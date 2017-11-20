@@ -279,6 +279,8 @@ for referencja in listaOpon:
                 runflat = True
             else:
                 print('Sprawdz nowy rodzaj rof dla', referencja)
+        except:
+            pass
         try:
             XL = re.search(
                 '<td>Nośność opony</td>\n<td class=\"jqs-cf-value\">(.+?)</td>',
