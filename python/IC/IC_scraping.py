@@ -22,7 +22,7 @@ driver = webdriver.Chrome(
 # driver = webdriver.Chrome()  Optional argument, if not specified will search path.
 
 
-def getproductsFromPage(listaOpon, dzis):
+def getproductsFromPage(listaOpon, dzis, delivery):
 
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     sleep(2)
@@ -58,6 +58,7 @@ def getproductsFromPage(listaOpon, dzis):
                     link,
                     title,
                     price,
+                    delivery,
                     dzis
                 ])
             except:
@@ -77,23 +78,35 @@ def getproductsFromPage(listaOpon, dzis):
     except:
         return True
     else:
-        getproductsFromPage(listaOpon, dzis)
+        getproductsFromPage(listaOpon, dzis, delivery)
 
 
 
 listaOpon = []
 now = datetime.datetime.now()
 dzis = now.isoformat()[:10]
-adres = 'https://sklep.intercars.com.pl/szukaj/opony-i-felgi-2/'
+
+adresPodstawowy = 'https://sklep.intercars.com.pl/szukaj/opony-i-felgi-2/'
+adresDostepne = adresPodstawowy+'#availabilities=2'
+delivery = '24h'
 try:
-    driver.get(adres)
+    driver.get(adresDostepne)
 except:
-    print("Nie udało się otworzyć adresu", adres)
+    print("Nie udało się otworzyć adresu", adresDostepne)
 sleep(3)
-getproductsFromPage(listaOpon, dzis)
+getproductsFromPage(listaOpon, dzis, delivery)
+
+adresNiedostepne = adresPodstawowy+'#availabilities=3'
+delivery = 'ask'
+try:
+    driver.get(adresNiedostepne)
+except:
+    print("Nie udało się otworzyć adresu", adresNiedostepne)
+sleep(3)
+getproductsFromPage(listaOpon, dzis, delivery)
 
 lista_Opon = pd.DataFrame(
-    listaOpon, columns=['link', 'title', 'price', 'dateRetrieved'])
+    listaOpon, columns=['link', 'title', 'price', 'delivery', 'dateRetrieved'])
 sciezka = 'datasets/pricesIC.csv'
 if os.path.exists(sciezka):
     lista_Opon.to_csv(sciezka, sep=';', decimal=',', mode='a', header=False)
@@ -349,11 +362,12 @@ sciezka = 'datasets/tireDataIC.csv'
 sciezkaNewTires = 'datasets/tireDataICNew.csv'
 sciezkaRemote = '/mnt/scraping/tireDataIC.csv'
 sciezkaRemoteNewTires = '/mnt/scraping/tireDataICNew.csv'
-listaSciezek = [sciezka, sciezkaNewTires, sciezkaRemote, sciezkaNewTires]
-for i in listaSciezek:
-    try:
-        zapiszDfDoCsv(dane_opon, i)
-    except:
-        print("Nie udalo sie zapisac w", i)
+listaSciezek = [sciezka, sciezkaNewTires, sciezkaRemote, sciezkaRemoteNewTires]
+if len(dane_opon)>0:
+    for i in listaSciezek:
+        try:
+            zapiszDfDoCsv(dane_opon, i)
+        except:
+            print("Nie udalo sie zapisac w", i)
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
