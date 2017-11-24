@@ -24,7 +24,7 @@ Plugin 'kien/ctrlp.vim' "search for basically anything from VIM
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
 Plugin 'tpope/vim-fugitive'
 Plugin 'tmhedberg/SimpylFold'
-Plugin 'vim-scripts/simple-pairs'
+Plugin 'Raimondi/delimitMate'
 
 Plugin 'thinca/vim-quickrun'
 let g:quickrun_config = {
