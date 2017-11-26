@@ -29,6 +29,7 @@ import datetime
 import os
 import shutil
 import getpass
+import sys
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -38,8 +39,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 def isLISI(string):
     string = string.strip()
     return re.search('\d\d\d?/?\d?\d?\d?\D', string).group(0) == string
-
-print(isLISI('101/Y'))
 
 
 user = getpass.getuser()
@@ -63,6 +62,7 @@ def getproductsFromPage(listaOpon, dzis):
     products = soup.findAll(True, {'class': 'boxRight'})
     for prod in products:
         if (1 == 1):
+            # prod = str(prod).replace('\n', '')
             try:
                 link = re.search('href=\"\.\.(.+?)\"><span class=\"productClass',
                                  str(prod).replace("\n", "")).group(1)
@@ -70,16 +70,49 @@ def getproductsFromPage(listaOpon, dzis):
                 print('sprawdz brak linka')
                 link = '_n/a'
             try:
-                size = re.search('\"productParams\">(.+?)</span>',
+                sizeEU = re.search('\"productParams\">(.+?)</span>',
                                   str(prod).replace("\n", "")).group(1)
                 brand = re.search('\"productName\">(.+?)<span>',
                                   str(prod).replace("\n", "")).group(1)
                 pattern = re.search('\"productName\">(.+?)<span>(.+?)</span>',
                                   str(prod).replace("\n", "")).group(2)
-                title = size+' '+brand+pattern
+                title = sizeEU+' '+brand+pattern
             except:
                 title = '_n/a'
                 print('sprawdz brak tytulu')
+            # try:
+                # prodClass = re.search('\"productClass\">(.+?)</span>',
+                                  # str(prod).replace("\n", "")).group(1)
+                # klasy = {
+                    # 'Klasa ekonomiczna': 'budget', 
+                    # 'Klasa średnia': 'medium', 
+                    # 'Klasa premium': 'premium'
+                # }
+                # klasa = klasy[prodClass]
+            # except:
+                # print('sprawdz brak klasy', link)
+                # print(sys.exc_info())
+                # klasa = ''
+            # try:
+                # etykiety = prod.findAll(True, {'class': 'lineInfo'})
+                # etykiety = str(etykiety).replace('\n', '')
+                # try:
+                    # RR = re.search('1s\.png" style=\"height:18px;\"/>(.+?)<', etykiety).group(1).strip()
+                # except:
+                    # print('blad wyszukania RR dla', link, sys.exc_info())
+                # try:
+                    # WG = re.search('2s\.png" style=\"height:18px;\"/>(.+?)<', etykiety).group(1).strip()
+                # except:
+                    # print('blad wyszukania WG dla', link, sys.exc_info())
+                # try:
+                    # dB = re.search('3s\.gif" style=\"height:18px;\"/>(.+?)( d?B?)(.+?)<', etykiety).group(1).strip()
+                # except:
+                    # print('blad wyszukania dB dla', link, sys.exc_info())
+                # print(RR, WG, dB, link)
+            # except:
+                # print('sth went wrong', link, sys.exc_info())
+
+
             try:
                 price = re.search('class=\"value\">(.+?) zł<',
                                   str(prod).replace("\n", "")).group(1)
@@ -134,8 +167,8 @@ now = datetime.datetime.now()
 dzis = now.isoformat()[:10]
 adresPocz = 'https://oponafelga.pl/szukaj/?marka=&rozmiar=&sezon='
 adresKonc = '&pojazd=#results'
-sezony = ['zimowe', 'letnie', 'caloroczne']
-# sezony = ['caloroczne']
+sezony = ['zimowe', 'letnie', 'caloroczne'] 
+# sezony = ['caloroczne'] # dev
 for i in sezony:
     adres = adresPocz+i+adresKonc
     try:
@@ -161,6 +194,7 @@ try:
         lista_Opon.to_csv(sciezka2, sep=';', decimal=',')
 except:
     print("Nie udało się zapisac na dysku sieciowym")
+driver.quit() # dev
 
 
 

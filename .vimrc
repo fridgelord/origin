@@ -31,6 +31,7 @@ let g:quickrun_config = {
       \'*': {
       \'outputter/buffer/split': ':rightbelow vsplit'},}
 nnoremap <silent> <F5> :QuickRun<CR>
+vnoremap <silent> <F5> :QuickRun<CR>
 " inoremap <silent> <Esc><F5> :QuickRun<CR>
 
 Bundle 'Valloric/YouCompleteMe'
