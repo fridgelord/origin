@@ -125,10 +125,13 @@ except:
 
 
 
-biezacaBazaOpon = pd.read_csv(
-    'datasets/tireDataIC.csv', dtype='str', header=0, sep=';', usecols=[1])
-biezacaBazaOpon = biezacaBazaOpon['link'].values.tolist()
-daneOpon = []
+try:
+    biezacaBazaOpon = pd.read_csv(
+        'datasets/tireDataOF.csv', dtype='str', header=0, sep=';', usecols=[1])
+    biezacaBazaOpon = biezacaBazaOpon['link'].values.tolist()
+except:
+    biezacaBazaOpon = []
+    print ('brak bazy opon, tworze nowa')
 # for referencja in [['/produkty/1578739-pirelli-scorpion-atr-32555-r22-116-h']]:
 for referencja in listaOpon:
     odnosnik = referencja[0]
