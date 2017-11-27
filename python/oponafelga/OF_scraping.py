@@ -7,7 +7,7 @@
 ## rozmiar terenowe ??/(?)?.??R??
 ## LI wyrzucic nawiasy, 0 na pocz (np. 099/097), XL do XL, SI do SI, wyrzucic puste
 ## SI wyrzucic nawiasy, LI do LI, ZR(Y) i ZRY -> Y, male litery na duze
-## dlaczego nie ma sezonu calorocznych?
+## dla_czego nie ma sezonu calorocznych?
 ## tireType runflat???
 ## producer duze litery tylko
 ## RBP wyrzucic -, 2016, C, FR
@@ -40,6 +40,10 @@ def isLISI(string):
     string = string.strip()
     return re.search('\d\d\d?/?\d?\d?\d?\D', string).group(0) == string
 
+def err(gdzie, dla_czego=''):
+    print('BLAD', sys.exc_info(), 'W DZIALANIU', gdzie,
+          ('DLA', dla_czego) if dla_czego != '' else '')
+
 
 user = getpass.getuser()
 chromePath = shutil.which('chromedriver')
@@ -56,9 +60,6 @@ def getproductsFromPage(listaOpon, dzis):
     pageSource = driver.page_source
 
     soup = BeautifulSoup(pageSource, 'html.parser')
-    # with open('datasets/bs', 'w') as tf:
-        # tf.write(str(soup))
-        # tf.close()
     products = soup.findAll(True, {'class': 'boxRight'})
     for prod in products:
         if (1 == 1):
@@ -80,37 +81,41 @@ def getproductsFromPage(listaOpon, dzis):
             except:
                 title = '_n/a'
                 print('sprawdz brak tytulu')
-            # try:
-                # prodClass = re.search('\"productClass\">(.+?)</span>',
-                                  # str(prod).replace("\n", "")).group(1)
-                # klasy = {
-                    # 'Klasa ekonomiczna': 'budget', 
-                    # 'Klasa średnia': 'medium', 
-                    # 'Klasa premium': 'premium'
-                # }
-                # klasa = klasy[prodClass]
-            # except:
-                # print('sprawdz brak klasy', link)
-                # print(sys.exc_info())
-                # klasa = ''
-            # try:
-                # etykiety = prod.findAll(True, {'class': 'lineInfo'})
-                # etykiety = str(etykiety).replace('\n', '')
-                # try:
-                    # RR = re.search('1s\.png" style=\"height:18px;\"/>(.+?)<', etykiety).group(1).strip()
-                # except:
-                    # print('blad wyszukania RR dla', link, sys.exc_info())
-                # try:
-                    # WG = re.search('2s\.png" style=\"height:18px;\"/>(.+?)<', etykiety).group(1).strip()
-                # except:
-                    # print('blad wyszukania WG dla', link, sys.exc_info())
-                # try:
-                    # dB = re.search('3s\.gif" style=\"height:18px;\"/>(.+?)( d?B?)(.+?)<', etykiety).group(1).strip()
-                # except:
-                    # print('blad wyszukania dB dla', link, sys.exc_info())
-                # print(RR, WG, dB, link)
-            # except:
-                # print('sth went wrong', link, sys.exc_info())
+            try:
+                prodClass = re.search('\"productClass\">(.+?)</span>',
+                                  str(prod).replace("\n", "")).group(1)
+                klasy = {
+                    'Klasa ekonomiczna': 'budget', 
+                    'Klasa średnia': 'medium', 
+                    'Klasa premium': 'premium',
+                    'Klasa ': '_n/a'
+                }
+                klasa = klasy[prodClass]
+            except:
+                print('sprawdz brak klasy', link)
+                print(sys.exc_info())
+                klasa = '_n/a'
+            etykiety = prod.findAll(True, {'class': 'lineInfo'})
+            etykiety = str(etykiety).replace('\n', '')
+            try:
+                RR = re.search('1s\.png" style=\"height:18px;\"/>(.+?)<',
+                               etykiety).group(1).strip()
+            except:
+                print('blad wyszukania RR dla', link, sys.exc_info())
+                RR = '_n/a'
+            try:
+                WG = re.search('2s\.png" style=\"height:18px;\"/>(.+?)<', 
+                               etykiety).group(1).strip()
+            except:
+                print('blad wyszukania WG dla', link, sys.exc_info())
+                WG = '_n/a'
+            try:
+                dB = re.search('3s\.gif\" style=\"height:18px;\"/>\s*(\d{0,2}|-*)\s.*<',
+                               etykiety).group(1).strip()
+                dB = '_n/a' if dB == '-'
+            except:
+                print('blad wyszukania dB dla', link, sys.exc_info())
+                dB = '_n/a'
 
 
             try:
@@ -167,8 +172,8 @@ now = datetime.datetime.now()
 dzis = now.isoformat()[:10]
 adresPocz = 'https://oponafelga.pl/szukaj/?marka=&rozmiar=&sezon='
 adresKonc = '&pojazd=#results'
-sezony = ['zimowe', 'letnie', 'caloroczne'] 
-# sezony = ['caloroczne'] # dev
+# sezony = ['zimowe', 'letnie', 'caloroczne'] 
+sezony = ['caloroczne'] # dev
 for i in sezony:
     adres = adresPocz+i+adresKonc
     try:
