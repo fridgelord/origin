@@ -30,8 +30,8 @@ Plugin 'thinca/vim-quickrun'
 let g:quickrun_config = {
       \'*': {
       \'outputter/buffer/split': ':rightbelow vsplit'},}
-nnoremap <silent> <F5> :QuickRun<CR>
-vnoremap <silent> <F5> :QuickRun<CR>
+nnoremap <silent> <F5> :QuickRun python3<CR>
+vnoremap <silent> <F5> :QuickRun python3<CR>
 " inoremap <silent> <Esc><F5> :QuickRun<CR>
 
 Bundle 'Valloric/YouCompleteMe'
