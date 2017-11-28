@@ -65,7 +65,7 @@ def getproductsFromPage(listaOpon, dzis):
         if (1 == 1):
             # prod = str(prod).replace('\n', '')
             try:
-                link = re.search('href=\"\.\.(.+?)\"><span class=\"productClass',
+                link = re.search('href=\".*(/opona.+?)\"><span class=\"productClass',
                                  str(prod).replace("\n", "")).group(1)
             except:
                 print('sprawdz brak linka')
@@ -130,14 +130,12 @@ def getproductsFromPage(listaOpon, dzis):
                 print("sprawdz brak ceny", link)
             if str(prod).find('Towar dostępny od ręki') != -1:
                 delivery='24h'
-            elif str(prod).find('Czas dostawy') != -1:
-                try:
-               	    delivery = re.search('Czas dostawy (.+?) dni</span>', str(prod).replace("\n", "")).group(1)
-                except:
-                    pass
             else:
-                delivery="nieznany"
-                print("sprawdz nowy rodzaj dostawy", title)
+                try:
+               	    delivery = re.search('Czas dostawy (.+?)</span>', str(prod).replace("\n", "")).group(1)
+                except:
+                    delivery="nieznany"
+                    print("sprawdz nowy rodzaj dostawy", title)
             try:
                 listaOpon.append([
                     link,
