@@ -47,3 +47,5 @@
   patch = add --patch
   tuck = stash save
   untuck = stash pop "stash@{0}"
+[push]
+	default = simple
