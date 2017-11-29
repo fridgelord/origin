@@ -64,11 +64,12 @@ def getproductsFromPage(listaOpon, dzis):
         if (1 == 1):
             # prod = str(prod).replace('\n', '')
             try:
-                link = re.search('href=\"\.\.(.+?)\"><span class=\"productClass',
+                link = re.search('href=\".*(/opona.+?)\"><span class=\"productClass',
                                  str(prod).replace("\n", "")).group(1)
             except:
                 print('sprawdz brak linka')
                 link = '_n/a'
+            print(link)
             try:
                 sizeEU = re.search('\"productParams\">(.+?)</span>',
                                   str(prod).replace("\n", "")).group(1)
@@ -125,14 +126,12 @@ def getproductsFromPage(listaOpon, dzis):
                 print("sprawdz brak ceny", link)
             if str(prod).find('Towar dostępny od ręki') != -1:
                 delivery='24h'
-            elif str(prod).find('Czas dostawy') != -1:
-                try:
-               	    delivery = re.search('Czas dostawy (.+?) dni</span>', str(prod).replace("\n", "")).group(1)
-                except:
-                    pass
             else:
-                delivery="nieznany"
-                print("sprawdz nowy rodzaj dostawy", title)
+                try:
+               	    delivery = re.search('Czas dostawy (.+?)</span>', str(prod).replace("\n", "")).group(1)
+                except:
+                    delivery="nieznany"
+                    print("sprawdz nowy rodzaj dostawy", link)
             try:
                 listaOpon.append([
                     link,
@@ -144,16 +143,24 @@ def getproductsFromPage(listaOpon, dzis):
             except:
                 print("cos nie tek z dodawaniem do listy", title)
     try:
+        try:
+            chatElement = driver.find_element_by_name('close')
+            if chatElement.get_attribute('title') == 'Zakończyć chat':
+                chatElement.click()
+        except:
+            pass
         element = driver.find_element_by_link_text('następna strona')
-        # klasa = element.get_attribute('class')
-        # if klasa != 'jqs-pgn jqs-next pgn':
-            # raise
         driver.execute_script("arguments[0].scrollIntoView();", element)
         driver.execute_script("window.scrollBy(0,-250)", "")
-        actions = ActionChains(driver)
-        actions.move_to_element(element).perform()
+        # actions = ActionChains(driver)
+        # actions.move_to_element(element).perform()
+        try:
+            nast = element.get_attribute('href')
+        except:
+            print('no href attr')
         sleep(0.5)
-        element.click()
+        # element.click()
+        driver.get('https://oponafelga.pl/szukaj/' + nast)
         sleep(4)
     except:
         return True
@@ -194,128 +201,4 @@ try:
         lista_Opon.to_csv(sciezka2, sep=';', decimal=',')
 except:
     print("Nie udało się zapisac na dysku sieciowym")
-driver.quit() # dev
-
-
-
-try:
-    biezacaBazaOpon = pd.read_csv(
-        'datasets/tireDataOF.csv', dtype='str', header=0, sep=';', usecols=[1])
-    biezacaBazaOpon = biezacaBazaOpon['link'].values.tolist()
-except:
-    biezacaBazaOpon = []
-    print ('brak bazy opon, tworze nowa')
-daneOpon = []
-# for referencja in [['/opona/vredestein_quatrac_5_59371.html']]:
-for referencja in listaOpon:
-    odnosnik = referencja[0]
-    if odnosnik not in biezacaBazaOpon:
-        try:
-            adres = 'https://oponafelga.pl' + odnosnik
-            driver.get(adres)
-            sleep(2)
-        except:
-            print("Nie udało się otworzyć strony dla", adres)
-            continue
-        pageSource = driver.page_source
-        soup = BeautifulSoup(pageSource, 'html.parser')
-        table = soup.find('table', attrs={'class':'produkt'})
-        table_body = table.find('tbody')
-        rows = table_body.find_all('tr')
-        tempList = []
-        for row in rows:
-            cols = row.find_all('td')
-            cols = [ele.text.strip() for ele in cols]
-            tempList.append(cols)
-        for i in [6, 5, 3, 2, 0]:
-            tempList.pop(i)
-        producent = tempList[0][0]
-        bieznik = tempList[0][1]
-        sezon = tempList[0][2].lower()
-        if sezon == 'letnie':
-            sezon = 'summer'
-        elif sezon == 'zimowe':
-            sezon = 'winter'
-        elif sezon == 'caloroczne':
-            sezon = 'allseason'
-        else:
-            print('Sprawdz nowy rodzaj sezonu dla', adres)
-            sezon = '_n/a'
-        przeznaczenie = tempList[0][3]
-        if przeznaczenie == 'osobowy':
-            przeznaczenie = 'CAR'
-        elif przeznaczenie == 'dostawczy':
-            przeznaczenie = 'LTR'
-        elif przeznaczenie == '4x4':
-            przeznaczenie = 'SUV/4x4'
-        else:
-            print('Sprawdz nowy rodzaj przeznaczenia dla', adres)
-            przeznaczenie = '_n/a'
-        rozmiar = tempList[1][0].replace('C','')
-        try:
-            LI = re.search('(.+?) \(do', tempList[1][1]).group(1)
-        except:
-            print('sprawdz brak LI dla', adres)
-            LI = ''
-        try:
-            SI = re.search('(.+?) \(do', tempList[1][2]).group(1)
-        except:
-            print('sprawdz brak SI dla', adres)
-            SI = ''
-        XL = tempList[1][3]
-        rant = tempList[2][0]
-        homol = tempList[2][1]
-        cecha = tempList[2][2]
-        prod_kod = tempList[2][3]
-
-        szer = rozmiar
-        profil = ''
-        osadzenie = ''
-        zastosowanie = ''
-        RR = ''
-        WG = ''
-        dB = ''
-        noise = ''
-        EAN = ''
-        indeks = ''
-        runflat = ''
-        DOT = ''
-        klasa = ''
-
-
-
-        daneOpon.append([
-            odnosnik, szer, profil, osadzenie, LI, SI, sezon, bieznik,
-            zastosowanie, przeznaczenie, RR, WG, dB, noise, producent,
-            prod_kod, EAN, indeks, rant, runflat, cecha, XL, DOT, klasa, dzis
-        ])
-
 driver.quit()
-
-dane_opon = pd.DataFrame(
-    daneOpon,
-    columns=[
-        'link', 'width', 'profile', 'seat', 'LI', 'SI', 'season', 'pattern',
-        'application', 'tireType', 'RR', 'WG', 'dB', 'noise', 'producer',
-        'manuf_code', 'EAN', 'ICindex', 'RBP', 'ROF', 'addFeature', 'XL',
-        'DOT', 'tier', 'dateRetrieved'
-    ])
-
-def zapiszDfDoCsv(dataFr, sciezka):
-    if os.path.exists(sciezka):
-        dataFr.to_csv(sciezka, sep=';', decimal=',', mode='a', header=False)
-    else:
-        dataFr.to_csv(sciezka, sep=';', decimal=',')
-
-sciezka = 'datasets/tireDataOF.csv'
-sciezkaNewTires = 'datasets/tireDataOF.csv'
-sciezkaRemote = '/mnt/scraping/tireDataOF.csv'
-sciezkaRemoteNewTires = '/mnt/scraping/tireDataOF.csv'
-listaSciezek = [sciezka, sciezkaNewTires, sciezkaRemote, sciezkaNewTires]
-for i in listaSciezek:
-    try:
-        zapiszDfDoCsv(dane_opon, i)
-    except:
-        print("Nie udalo sie zapisac w", i)
-
-# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
