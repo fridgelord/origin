@@ -7,7 +7,7 @@
 ## rozmiar terenowe ??/(?)?.??R??
 ## LI wyrzucic nawiasy, 0 na pocz (np. 099/097), XL do XL, SI do SI, wyrzucic puste
 ## SI wyrzucic nawiasy, LI do LI, ZR(Y) i ZRY -> Y, male litery na duze
-## dla_czego nie ma sezonu calorocznych?
+## dlaczego nie ma sezonu calorocznych?
 ## tireType runflat???
 ## producer duze litery tylko
 ## RBP wyrzucic -, 2016, C, FR
@@ -135,7 +135,7 @@ def getproductsFromPage(listaOpon, dzis):
                	    delivery = re.search('Czas dostawy (.+?)</span>', str(prod).replace("\n", "")).group(1)
                 except:
                     delivery="nieznany"
-                    print("sprawdz nowy rodzaj dostawy", title)
+                    print("sprawdz nowy rodzaj dostawy", link)
             try:
                 listaOpon.append([
                     link,
@@ -147,16 +147,24 @@ def getproductsFromPage(listaOpon, dzis):
             except:
                 print("cos nie tek z dodawaniem do listy", title)
     try:
+        try:
+            chatElement = driver.find_element_by_name('close')
+            if chatElement.get_attribute('title') == 'Zakończyć chat':
+                chatElement.click()
+        except:
+            pass
         element = driver.find_element_by_link_text('następna strona')
-        # klasa = element.get_attribute('class')
-        # if klasa != 'jqs-pgn jqs-next pgn':
-            # raise
         driver.execute_script("arguments[0].scrollIntoView();", element)
         driver.execute_script("window.scrollBy(0,-250)", "")
-        actions = ActionChains(driver)
-        actions.move_to_element(element).perform()
+        # actions = ActionChains(driver)
+        # actions.move_to_element(element).perform()
+        try:
+            nast = element.get_attribute('href')
+        except:
+            print('no href attr')
         sleep(0.5)
-        element.click()
+        # element.click()
+        driver.get('https://oponafelga.pl/szukaj/' + nast)
         sleep(4)
     except:
         return True
