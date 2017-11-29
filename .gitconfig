@@ -1,6 +1,5 @@
-[user]
-	email = binkowski.mr@gmail.com
-	name = Marcin Binkowski
+[include]
+	path = .git-user
 [core]
 	editor = vim
 [alias]
