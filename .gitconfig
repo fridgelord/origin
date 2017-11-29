@@ -36,6 +36,7 @@
   unmerged = branch --no-merged
   unstash = stash pop
   what = show
+  lastcommitdiff = show
   untrack = rm -r --cached
   rewrite = rebase -i
   amend = commit --amend --no-edit
