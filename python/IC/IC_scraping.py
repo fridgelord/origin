@@ -125,13 +125,15 @@ except:
 
 
 
+bazaOponNameWoExtension = 'tireDataIC'
 try:
     biezacaBazaOpon = pd.read_csv(
-        'datasets/tireDataOF.csv', dtype='str', header=0, sep=';', usecols=[1])
+        'datasets/'+bazaOponNameWoExtension+'.csv', dtype='str', header=0, sep=';', usecols=[1])
     biezacaBazaOpon = biezacaBazaOpon['link'].values.tolist()
 except:
     biezacaBazaOpon = []
     print ('brak bazy opon, tworze nowa')
+daneOpon = []
 # for referencja in [['/produkty/1578739-pirelli-scorpion-atr-32555-r22-116-h']]:
 for referencja in listaOpon:
     odnosnik = referencja[0]
@@ -361,10 +363,10 @@ def zapiszDfDoCsv(dataFr, sciezka):
     else:
         dataFr.to_csv(sciezka, sep=';', decimal=',')
 
-sciezka = 'datasets/tireDataIC.csv'
-sciezkaNewTires = 'datasets/tireDataICNew.csv'
-sciezkaRemote = '/mnt/scraping/tireDataIC.csv'
-sciezkaRemoteNewTires = '/mnt/scraping/tireDataICNew.csv'
+sciezka = 'datasets/'+bazaOponNameWoExtension+'.csv'
+sciezkaNewTires = 'datasets/'+bazaOponNameWoExtension+'New.csv'
+sciezkaRemote = '/mnt/scraping/'+bazaOponNameWoExtension+'.csv'
+sciezkaRemoteNewTires = '/mnt/scraping/'+bazaOponNameWoExtension'+New.csv'
 listaSciezek = [sciezka, sciezkaNewTires, sciezkaRemote, sciezkaRemoteNewTires]
 if len(dane_opon)>0:
     for i in listaSciezek:
