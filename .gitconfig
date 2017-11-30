@@ -51,3 +51,9 @@
   untuck = stash pop "stash@{0}"
 [push]
 	default = simple
+[merge]
+	tool = diffconflicts
+[mergetool "diffconflicts"]
+	cmd = diffconflicts vim $BASE $LOCAL $REMOTE $MERGED
+	trustExitCode = true
+	keepBackup = false
