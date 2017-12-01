@@ -366,7 +366,7 @@ def zapiszDfDoCsv(dataFr, sciezka):
 sciezka = 'datasets/'+bazaOponNameWoExtension+'.csv'
 sciezkaNewTires = 'datasets/'+bazaOponNameWoExtension+'New.csv'
 sciezkaRemote = '/mnt/scraping/'+bazaOponNameWoExtension+'.csv'
-sciezkaRemoteNewTires = '/mnt/scraping/'+bazaOponNameWoExtension'+New.csv'
+sciezkaRemoteNewTires = '/mnt/scraping/'+bazaOponNameWoExtension+'New.csv'
 listaSciezek = [sciezka, sciezkaNewTires, sciezkaRemote, sciezkaRemoteNewTires]
 if len(dane_opon)>0:
     for i in listaSciezek:
