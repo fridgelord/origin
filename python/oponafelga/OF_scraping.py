@@ -28,8 +28,9 @@ import re
 import datetime
 import os
 import shutil
-import getpass
+# import getpass
 import sys
+import platform
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -41,10 +42,10 @@ def isLISI(string):
     return re.search('\d\d\d?/?\d?\d?\d?\D', string).group(0) == string
 
 
-user = getpass.getuser()
+hostname = platform.node()
 chromePath = shutil.which('chromedriver')
 options = webdriver.ChromeOptions()
-if user == 'user':
+if hostname == 'user-Vostro-260':
     options.add_argument('headless')
 driver = webdriver.Chrome(chromePath, chrome_options=options)
 
