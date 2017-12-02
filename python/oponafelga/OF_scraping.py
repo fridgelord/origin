@@ -29,13 +29,11 @@ import datetime
 import os
 import shutil
 # import getpass
-import sys
 import platform
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
 # from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.action_chains import ActionChains
 
 def isLISI(string):
     string = string.strip()
@@ -57,9 +55,6 @@ def getproductsFromPage(listaOpon, dzis):
     pageSource = driver.page_source
 
     soup = BeautifulSoup(pageSource, 'html.parser')
-    # with open('datasets/bs', 'w') as tf:
-        # tf.write(str(soup))
-        # tf.close()
     products = soup.findAll(True, {'class': 'boxRight'})
     for prod in products:
         if (1 == 1):
@@ -70,49 +65,17 @@ def getproductsFromPage(listaOpon, dzis):
             except:
                 print('sprawdz brak linka')
                 link = '_n/a'
-            print(link)
             try:
                 sizeEU = re.search('\"productParams\">(.+?)</span>',
-                                  str(prod).replace("\n", "")).group(1)
+                                   str(prod).replace("\n", "")).group(1)
                 brand = re.search('\"productName\">(.+?)<span>',
                                   str(prod).replace("\n", "")).group(1)
                 pattern = re.search('\"productName\">(.+?)<span>(.+?)</span>',
-                                  str(prod).replace("\n", "")).group(2)
+                                    str(prod).replace("\n", "")).group(2)
                 title = sizeEU+' '+brand+pattern
             except:
                 title = '_n/a'
                 print('sprawdz brak tytulu')
-            # try:
-                # prodClass = re.search('\"productClass\">(.+?)</span>',
-                                  # str(prod).replace("\n", "")).group(1)
-                # klasy = {
-                    # 'Klasa ekonomiczna': 'budget', 
-                    # 'Klasa średnia': 'medium', 
-                    # 'Klasa premium': 'premium'
-                # }
-                # klasa = klasy[prodClass]
-            # except:
-                # print('sprawdz brak klasy', link)
-                # print(sys.exc_info())
-                # klasa = ''
-            # try:
-                # etykiety = prod.findAll(True, {'class': 'lineInfo'})
-                # etykiety = str(etykiety).replace('\n', '')
-                # try:
-                    # RR = re.search('1s\.png" style=\"height:18px;\"/>(.+?)<', etykiety).group(1).strip()
-                # except:
-                    # print('blad wyszukania RR dla', link, sys.exc_info())
-                # try:
-                    # WG = re.search('2s\.png" style=\"height:18px;\"/>(.+?)<', etykiety).group(1).strip()
-                # except:
-                    # print('blad wyszukania WG dla', link, sys.exc_info())
-                # try:
-                    # dB = re.search('3s\.gif" style=\"height:18px;\"/>(.+?)( d?B?)(.+?)<', etykiety).group(1).strip()
-                # except:
-                    # print('blad wyszukania dB dla', link, sys.exc_info())
-                # print(RR, WG, dB, link)
-            # except:
-                # print('sth went wrong', link, sys.exc_info())
 
 
             try:
@@ -129,7 +92,7 @@ def getproductsFromPage(listaOpon, dzis):
                 delivery='24h'
             else:
                 try:
-               	    delivery = re.search('Czas dostawy (.+?)</span>', str(prod).replace("\n", "")).group(1)
+                    delivery = re.search('Czas dostawy (.+?)</span>', str(prod).replace("\n", "")).group(1)
                 except:
                     delivery="nieznany"
                     print("sprawdz nowy rodzaj dostawy", link)
@@ -161,7 +124,8 @@ def getproductsFromPage(listaOpon, dzis):
             print('no href attr')
         sleep(0.5)
         # element.click()
-        driver.get('https://oponafelga.pl/szukaj/' + nast)
+        # driver.get('https://oponafelga.pl/szukaj/' + nast)
+        driver.get(nast)
         sleep(4)
     except:
         return True
@@ -175,7 +139,7 @@ now = datetime.datetime.now()
 dzis = now.isoformat()[:10]
 adresPocz = 'https://oponafelga.pl/szukaj/?marka=&rozmiar=&sezon='
 adresKonc = '&pojazd=#results'
-sezony = ['zimowe', 'letnie', 'caloroczne'] 
+sezony = ['zimowe', 'letnie', 'caloroczne']
 # sezony = ['caloroczne'] # dev
 for i in sezony:
     adres = adresPocz+i+adresKonc
