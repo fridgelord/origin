@@ -28,13 +28,12 @@ import re
 import datetime
 import os
 import shutil
-import getpass
-import sys
+# import getpass
+import platform
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
 # from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.action_chains import ActionChains
 
 def isLISI(string):
     string = string.strip()
@@ -45,10 +44,10 @@ def err(gdzie, dla_czego=''):
           ('DLA', dla_czego) if dla_czego != '' else '')
 
 
-user = getpass.getuser()
+hostname = platform.node()
 chromePath = shutil.which('chromedriver')
 options = webdriver.ChromeOptions()
-if user == 'user':
+if hostname == 'user-Vostro-260':
     options.add_argument('headless')
 driver = webdriver.Chrome(chromePath, chrome_options=options)
 
@@ -72,11 +71,11 @@ def getproductsFromPage(listaOpon, dzis):
                 link = '_n/a'
             try:
                 sizeEU = re.search('\"productParams\">(.+?)</span>',
-                                  str(prod).replace("\n", "")).group(1)
+                                   str(prod).replace("\n", "")).group(1)
                 brand = re.search('\"productName\">(.+?)<span>',
                                   str(prod).replace("\n", "")).group(1)
                 pattern = re.search('\"productName\">(.+?)<span>(.+?)</span>',
-                                  str(prod).replace("\n", "")).group(2)
+                                    str(prod).replace("\n", "")).group(2)
                 title = sizeEU+' '+brand+pattern
             except:
                 title = '_n/a'
@@ -132,7 +131,7 @@ def getproductsFromPage(listaOpon, dzis):
                 delivery='24h'
             else:
                 try:
-               	    delivery = re.search('Czas dostawy (.+?)</span>', str(prod).replace("\n", "")).group(1)
+                    delivery = re.search('Czas dostawy (.+?)</span>', str(prod).replace("\n", "")).group(1)
                 except:
                     delivery="nieznany"
                     print("sprawdz nowy rodzaj dostawy", link)
@@ -164,7 +163,8 @@ def getproductsFromPage(listaOpon, dzis):
             print('no href attr')
         sleep(0.5)
         # element.click()
-        driver.get('https://oponafelga.pl/szukaj/' + nast)
+        # driver.get('https://oponafelga.pl/szukaj/' + nast)
+        driver.get(nast)
         sleep(4)
     except:
         return True
