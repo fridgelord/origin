@@ -191,8 +191,8 @@ now = datetime.datetime.now()
 dzis = now.isoformat()[:10]
 adresPocz = 'https://oponafelga.pl/szukaj/?marka=&rozmiar=&sezon='
 adresKonc = '&pojazd=#results'
-# sezony = ['zimowe', 'letnie', 'caloroczne'] 
-sezony = ['caloroczne'] # dev
+sezony = ['zimowe', 'letnie', 'caloroczne'] 
+# sezony = ['caloroczne'] # dev
 for i in sezony:
     adres = adresPocz+i+adresKonc
     try:
@@ -210,9 +210,9 @@ lista_Opon = pd.DataFrame(
         'price', 
         'delivery', 
         'dateRetrieved',
-    ] + kolumnyDoPozniejszegoUzycia]
+    ] + kolumnyDoPozniejszegoUzycia)
     
-lista_Opon.drop(lista_Opon.columns[kolumnyDoPozniejszegoUzycia], axis=1, inplace=True)
+lista_Opon.drop(kolumnyDoPozniejszegoUzycia, axis=1, inplace=True)
 sciezka = 'datasets/pricesOF.csv'
 if os.path.exists(sciezka):
     lista_Opon.to_csv(sciezka, sep=';', decimal=',', mode='a', header=False)
@@ -227,7 +227,6 @@ try:
         lista_Opon.to_csv(sciezka2, sep=';', decimal=',')
 except:
     print("Nie udało się zapisac na dysku sieciowym")
-# driver.quit() # dev
 
 
 
@@ -252,6 +251,17 @@ for referencja in listaOpon:
             continue
         pageSource = driver.page_source
         soup = BeautifulSoup(pageSource, 'html.parser')
+        top_table = soup.find('table', attrs={'class':'results throwinBasket'})
+        top_table_body = top_table.find('tbody')
+        top_rows = top_table_body.find_all('tr')
+        top_table_list = []
+        for row in top_rows:
+            cols = row.find_all('td')
+            cols = [ele.text.strip() for ele in cols]
+            top_table_list.append(cols)
+        DOT = top_table_list[0][1]
+        if DOT == '':
+            DOT = '_n/a'
         table = soup.find('table', attrs={'class':'produkt'})
         table_body = table.find('tbody')
         rows = table_body.find_all('tr')
@@ -283,14 +293,14 @@ for referencja in listaOpon:
             sezon = 'summer'
         elif sezon == 'zimowe':
             sezon = 'winter'
-        elif sezon == 'caloroczne ':
+        elif sezon == 'caloroczne':
             sezon = 'allseason'
         else:
             print('Sprawdz nowy rodzaj sezonu dla', adres)
             sezon = '_n/a'
         if LItemp == '':
             LI = '_n/a'
-        elif LI == 'XL':
+        elif LItemp == 'XL':
             XL = True
             LI = '_n/a'
         else:
@@ -345,6 +355,8 @@ for referencja in listaOpon:
             XL = True
         elif rantTemp in ['ROF', 'RF']:
             runflat = True
+        elif rantTemp == '':
+            pass
         else:
             print('Sprawdz nowy rodzaj rantu dla', adres)
 
@@ -364,7 +376,6 @@ for referencja in listaOpon:
         noise = ''
         EAN = ''
         indeks = ''
-        DOT = ''
         klasa = referencja[5]
 
 
