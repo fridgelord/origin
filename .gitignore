@@ -1,7 +1,13 @@
 # non-dot files
 /[^.]*
 !python
+
 python/lekcje
+python/KeepTrack
+python/oponafelga/datasets
+python/IC/datasets
+python/oponeo/datasets
+python/localtemp
 
 .adobe
 .android
