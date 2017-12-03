@@ -49,6 +49,7 @@
   patch = add --patch
   tuck = stash save
   untuck = stash pop "stash@{0}"
+	merge = merge --no-ff # always create commit when merging
 [push]
 	default = simple
 [merge]
