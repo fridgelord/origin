@@ -1,6 +1,7 @@
 set nocompatible
 filetype off
 
+
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -11,19 +12,28 @@ Plugin 'vim-scripts/indentpython.vim'
 let g:SimpylFold_docstring_preview=1 " see the docstrings for folded code
 
 Plugin 'nvie/vim-flake8' "pep8 check
+
 "Plugin 'scrooloose/syntastic' "syntax check
-"
+
 Plugin 'w0rp/ale' "syntax chech in the fly
 let g:ale_sign_column_always = 1
+let g:ale_change_sign_column_color = 1
 " let g:ale_lint_on_text_changed='normal'
-let g:ale_python_flake8_args = '--ignore=E,W,F403,F405 --select=F,C'
+let g:ale_python_flake8_args = '--ignore=E2,E3,E5,E722'
 
 
 Plugin 'scrooloose/nerdtree' "file tree
+let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
+
 Plugin 'kien/ctrlp.vim' "search for basically anything from VIM
+
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
+
 Plugin 'tpope/vim-fugitive'
+set diffopt+=vertical
+
 Plugin 'tmhedberg/SimpylFold'
+
 Plugin 'Raimondi/delimitMate'
 
 Plugin 'thinca/vim-quickrun'
@@ -32,18 +42,20 @@ let g:quickrun_config = {
       \'outputter/buffer/split': ':rightbelow vsplit'},}
 nnoremap <silent> <F5> :QuickRun python3<CR>
 vnoremap <silent> <F5> :QuickRun python3<CR>
-" inoremap <silent> <Esc><F5> :QuickRun<CR>
 
 Bundle 'Valloric/YouCompleteMe'
 let g:ycm_python_binary_path = '/usr/bin/python3'
+let g:ycm_autoclose_preview_window_after_completion=1
+map <leader>g  :YcmCompleter GoToDefinition<CR>
+map <leader>d  :YcmCompleter GetDoc<CR>
+
+" Plugin 'python-mode/python-mode'
+" let g:pymode_python = 'python3'
+"
 Plugin 'The-NERD-Commenter'
-" Add spaces after comment delimiters by default
-let g:NERDSpaceDelims = 1
-" Allow commenting and inverting empty lines (useful when commenting a region)
-let g:NERDCommentEmptyLines = 1
-" Align line-wise comment delimiters flush left instead of following code indentation
-let g:NERDDefaultAlign = 'left'
-" nnoremap <C-D> :call NERDComment(0,"toggle")<CR>
+let g:NERDSpaceDelims = 1 " Add spaces after comment delimiters by default
+let g:NERDCommentEmptyLines = 1 " Allow commenting and inverting empty lines (useful when commenting a region)
+let g:NERDDefaultAlign = 'left' " Align line-wise comment delimiters flush left instead of following code indentation
 noremap <silent> <C-D> :call NERDComment(0,"toggle")<CR>
 " vnoremap <C-D> :call NERDComment(0,"toggle")<CR>
 " inoremap <C-D> :call NERDComment(0,"toggle")<CR>
@@ -52,18 +64,29 @@ noremap <silent> <C-D> :call NERDComment(0,"toggle")<CR>
 call vundle#end()            " required
 filetype plugin indent on    " required
 """"""" end for Vundle
-let g:ycm_autoclose_preview_window_after_completion=1
-map <leader>g  :YcmCompleter GoToDefinition<CR>
-map <leader>d  :YcmCompleter GetDoc<CR>
+
+
+
 "let python_highlight_all=1
 syntax on
-let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
 
 "split navigations
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
+
+" remove search highlighting on esc
+nnoremap <silent> <Enter> :noh<cr>
+
+" map brackets and gn/gp for diffview to move to prev/next diff
+if &diff
+	set cursorline
+	map gn ]c
+	map gp [c
+	map ] ]c
+	map [ [c
+endif
 
 " Enable folding
 set foldmethod=indent
@@ -132,6 +155,7 @@ set lbr
 syn on
 set completeopt=menu,longest,preview
 set confirm
+set clipboard=unnamedplus				" use X11 register
 
 " set statusline=%<%f%h%m%r%=%b\ 0x%B\ \ %l,%c%V\ %P	"wyswietlanie numeru znaku w menu
 set laststatus=2
