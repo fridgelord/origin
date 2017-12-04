@@ -405,10 +405,10 @@ def zapiszDfDoCsv(dataFr, sciezka):
     else:
         dataFr.to_csv(sciezka, sep=';', decimal=',')
 
-sciezka = 'datasets/tireDataOF.csv'
-sciezkaNewTires = 'datasets/tireDataOF.csv'
-sciezkaRemote = '/mnt/scraping/tireDataOF.csv'
-sciezkaRemoteNewTires = '/mnt/scraping/tireDataOF.csv'
+sciezka = 'dev_datasets/tireDataOF.csv'
+sciezkaNewTires = 'dev_datasets/tireDataOF.csv'
+sciezkaRemote = '/mnt/scraping/dev/tireDataOF.csv'
+sciezkaRemoteNewTires = '/mnt/dev/scraping/tireDataOF.csv'
 listaSciezek = [sciezka, sciezkaNewTires, sciezkaRemote, sciezkaNewTires]
 for i in listaSciezek:
     try:
