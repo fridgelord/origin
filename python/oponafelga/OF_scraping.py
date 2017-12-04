@@ -22,6 +22,8 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 # from selenium.webdriver.support.ui import Select
 
+print('a')
+
 def isLISI(string):
     string = string.strip()
     return re.search('\d\d\d?/?\d?\d?\d?\D', string).group(0) == string
