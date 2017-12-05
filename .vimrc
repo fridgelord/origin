@@ -76,6 +76,8 @@ nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
+nnoremap ; :
+
 " remove search highlighting on esc
 nnoremap <silent> <Enter> :noh<cr>
 
@@ -105,6 +107,7 @@ au BufNewFile,BufRead *.py;
     \ set fileformat=unix
 "au BufRead,BufNewFile *.py,*.pyw,*.c,*.h ; match BadWhitespace /\s\+$/
 set encoding=utf-8
+autocmd FileType python nnoremap <F8> :0,$!yapf<Cr><C-o>
 
 "filetype plugin on
 " allow backspacing over everything in insert mode
@@ -179,5 +182,5 @@ au BufNewFile,BufRead *.js, *.html, *.css
     \ set shiftwidth=2
 
 set wildignorecase
-set timeoutlen=1000 
-set ttimeoutlen=10
+" set timeoutlen=1000 
+" set ttimeoutlen=10
