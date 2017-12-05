@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 # from selenium.webdriver.support.ui import Select
 
-print('a')
+print('b')
 
 def isLISI(string):
     string = string.strip()
@@ -215,13 +215,13 @@ lista_Opon = pd.DataFrame(
     ] + kolumnyDoPozniejszegoUzycia)
     
 lista_Opon.drop(kolumnyDoPozniejszegoUzycia, axis=1, inplace=True)
-sciezka = 'datasets/pricesOF.csv'
+sciezka = 'dev_datasets/pricesOF.csv'
 if os.path.exists(sciezka):
     lista_Opon.to_csv(sciezka, sep=';', decimal=',', mode='a', header=False)
 else:
     lista_Opon.to_csv(sciezka, sep=';', decimal=',')
 try:
-    sciezka2 = '/mnt/scraping/pricesOF.csv'
+    sciezka2 = '/mnt/scraping/dev/pricesOF.csv'
     if os.path.exists(sciezka2):
         lista_Opon.to_csv(
             sciezka2, sep=';', decimal=',', mode='a', header=False)
@@ -247,7 +247,7 @@ for referencja in listaOpon:
         try:
             adres = 'https://oponafelga.pl' + odnosnik
             driver.get(adres)
-            sleep(2)
+            sleep(4)
         except:
             print("Nie udało się otworzyć strony dla", adres)
             continue
