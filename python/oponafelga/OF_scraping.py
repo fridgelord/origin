@@ -193,8 +193,8 @@ now = datetime.datetime.now()
 dzis = now.isoformat()[:10]
 adresPocz = 'https://oponafelga.pl/szukaj/?marka=&rozmiar=&sezon='
 adresKonc = '&pojazd=#results'
-sezony = ['zimowe', 'letnie', 'caloroczne'] 
-# sezony = ['caloroczne'] # dev
+# sezony = ['zimowe', 'letnie', 'caloroczne'] 
+sezony = ['caloroczne'] # dev
 for i in sezony:
     adres = adresPocz+i+adresKonc
     try:
@@ -253,10 +253,14 @@ for referencja in listaOpon:
             continue
         pageSource = driver.page_source
         soup = BeautifulSoup(pageSource, 'html.parser')
-        top_table = soup.find('table', attrs={'class':'results throwinBasket'})
-        top_table_body = top_table.find('tbody')
-        top_rows = top_table_body.find_all('tr')
-        top_table_list = []
+        try:
+            top_table = soup.find('table', attrs={'class':'results throwinBasket'})
+            top_table_body = top_table.find('tbody')
+            top_rows = top_table_body.find_all('tr')
+            top_table_list = []
+        except:
+            err('searching table', adres)
+            continue
         for row in top_rows:
             cols = row.find_all('td')
             cols = [ele.text.strip() for ele in cols]
