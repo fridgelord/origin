@@ -5,6 +5,7 @@
 python/lekcje
 python/KeepTrack
 python/oponafelga/datasets
+python/oponafelga/dev_datasets
 python/IC/datasets
 python/oponeo/datasets
 python/localtemp
@@ -12,6 +13,7 @@ python/localtemp
 .adobe
 .android
 .appdata
+.bash-git-prompt
 .bash_history
 .bash_logout
 .cache
