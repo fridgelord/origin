@@ -11,6 +11,9 @@ import re
 import datetime
 import os
 import sys
+import platform
+import shutil
+
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -21,10 +24,12 @@ from selenium.webdriver.common.action_chains import ActionChains
 # In[2]:
 
 
+hostname = platform.node()
+chromePath = shutil.which('chromedriver')
 options = webdriver.ChromeOptions()
-options.add_argument('headless')
-#driver = webdriver.Chrome()  # Optional argument, if not specified will search path.
-driver = webdriver.Chrome('/usr/local/bin/chromedriver',chrome_options=options)  # Optional argument, if not specified will search path.
+if hostname == 'user-Vostro-260':
+    options.add_argument('headless')
+driver = webdriver.Chrome(chromePath, chrome_options=options)
 
 
 # In[3]:
