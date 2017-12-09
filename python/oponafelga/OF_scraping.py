@@ -46,6 +46,7 @@ SIdict = {'M': 'T'
           ,'W': 'W'
           ,'Y': 'Y'
           ,'Z': 'Z'
+          ,'': '_n/a'
          }
 
 
@@ -240,14 +241,14 @@ except:
     biezacaBazaOpon = []
     print ('brak bazy opon, tworze nowa')
 daneOpon = []
-# for referencja in [['/opona/vredestein_quatrac_5_59371.html']]:
-for referencja in listaOpon:
+# for referencja in listaOpon:
+for referencja in [['/opona/hankook_kinergy_eco_53960.html']]:
     odnosnik = referencja[0]
     if odnosnik not in biezacaBazaOpon:
         try:
             adres = 'https://oponafelga.pl' + odnosnik
             driver.get(adres)
-            sleep(4)
+            sleep(2)
         except:
             print("Nie udało się otworzyć strony dla", adres)
             continue
@@ -281,7 +282,7 @@ for referencja in listaOpon:
         producent = tempList[0][0].upper()
         bieznik = tempList[0][1]
         sezon = tempList[0][2].lower()
-        przeznaczenie = tempList[0][3]
+        przeznaczenie = tempList[0][3].upper()
         rozmiar = tempList[1][0].replace('C','')
         XLtemp = tempList[1][3].upper()
         rantTemp = tempList[2][0].upper()
@@ -291,6 +292,7 @@ for referencja in listaOpon:
         LItemp = tempList[1][1].upper()
         SItemp = tempList[1][2].upper()
         
+        LI = ''
         XL = False
         runflat = False
         rant = False
@@ -304,28 +306,34 @@ for referencja in listaOpon:
         else:
             print('Sprawdz nowy rodzaj sezonu dla', adres)
             sezon = '_n/a'
+        try:
+            SI = re.search('^[A-Z] \(DO', SItemp).group(1)
+        except:
+            try:
+                SI = re.search('\d\d([A-Z]) \(DO', SItemp).group(1)
+                LI = re.search('^(.+)[A-Z] \(DO', SItemp).group(1)
+            except:
+                try:
+                    SI = re.search('\d\d([A-Z]) \(DO', LItemp).group(1)
+                except:
+                    print('sprawdz brak SI dla', adres)
+                    SI = '_n/a'
         if LItemp == '':
             LI = '_n/a'
         elif LItemp == 'XL':
             XL = True
             LI = '_n/a'
+        elif LI != '':
+            pass
+        elif isLISI(XLtemp):
+            LI = XLtemp[:-2]
+            SI = XLtemp[-1]
         else:
             try:
                 LI = re.search('^\(?0?(\d+)\D', LItemp ).group(1)
             except:
                 print('sprawdz brak LI dla', adres)
                 LI = '_n/a'
-        try:
-            SI = re.search('(.+?) \(do', tempList[1][2]).group(1)
-        except:
-            try:
-                SI = re.search('\d\d([a-zA-Z])', SItemp).group(1)
-            except:
-                try:
-                    SI = re.search('\d\d([a-zA-Z])', LItemp).group(1)
-                except:
-                    print('sprawdz brak SI dla', adres)
-                    SI = '_n/a'
         if XLtemp in ['XL', 'RF']:
             XL = True
         elif XLtemp == '':
@@ -335,24 +343,22 @@ for referencja in listaOpon:
             XL = False
         elif XLtemp in ['C', 'C 8PR', 'DOT']:
             XL = False
-        elif isLISI(XLtemp):
-            LI = XLtemp[:-2]
-            SI = XLtemp[-1]
         else:
             print('sprawdz nowy XL dla', adres)
             XL = False
-        if przeznaczenie == 'osobowy':
+        if przeznaczenie == 'OSOBOWY' or przeznaczenie == 'OSOBOWE':
             przeznaczenie = 'CAR'
-        elif przeznaczenie == 'dostawczy':
+        elif przeznaczenie == 'DOSTAWCZY':
             przeznaczenie = 'LTR'
         elif przeznaczenie == '4x4':
             przeznaczenie = 'SUV/4x4'
-        elif przeznaczenie == 'runflat':
+        elif przeznaczenie == 'RUNFLAT':
             runflat = True
             przeznaczenie = '_n/a'
         else:
             print('Sprawdz nowy rodzaj przeznaczenia dla', adres)
             przeznaczenie = '_n/a'
+
         if rantTemp in ['TAK', 'RANT OCHRONNY']:
             rant = True
         elif rantTemp in ['-', '2016', 'C', 'FR']:
@@ -365,6 +371,11 @@ for referencja in listaOpon:
             pass
         else:
             print('Sprawdz nowy rodzaj rantu dla', adres)
+
+        try:
+            SI = SIdict[SI]
+        except:
+            err('korzystanie ze slownika SI', adres)
 
 
         szer = re.search('[0-9]{2}[0-9]?[/Xx]?(.*)[Rr][0-9]', rozmiar).group(1) 
