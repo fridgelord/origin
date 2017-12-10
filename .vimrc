@@ -16,10 +16,10 @@ Plugin 'nvie/vim-flake8' "pep8 check
 "Plugin 'scrooloose/syntastic' "syntax check
 
 Plugin 'w0rp/ale' "syntax chech in the fly
-let g:ale_sign_column_always = 1
+let g:ale_sign_column_always = 0
 let g:ale_change_sign_column_color = 1
-" let g:ale_lint_on_text_changed='normal'
-let g:ale_python_flake8_args = '--ignore=E2,E3,E5,E722'
+let g:ale_lint_on_text_changed='normal'
+let g:ale_python_flake8_args = '--ignore=E115,E124,E2,E3,E5,E722'
 
 
 Plugin 'scrooloose/nerdtree' "file tree
@@ -43,11 +43,13 @@ let g:quickrun_config = {
 nnoremap <silent> <F5> :QuickRun python3<CR>
 vnoremap <silent> <F5> :QuickRun python3<CR>
 
-Bundle 'Valloric/YouCompleteMe'
-let g:ycm_python_binary_path = '/usr/bin/python3'
-let g:ycm_autoclose_preview_window_after_completion=1
-map <leader>g  :YcmCompleter GoToDefinition<CR>
-map <leader>d  :YcmCompleter GetDoc<CR>
+" Bundle 'Valloric/YouCompleteMe'
+" let g:ycm_python_binary_path = '/usr/bin/python3'
+" let g:ycm_autoclose_preview_window_after_completion=1
+" map <leader>g  :YcmCompleter GoToDefinition<CR>
+" map <leader>d  :YcmCompleter GetDoc<CR>
+"
+Plugin 'davidhalter/jedi-vim'
 
 " Plugin 'python-mode/python-mode'
 " let g:pymode_python = 'python3'
