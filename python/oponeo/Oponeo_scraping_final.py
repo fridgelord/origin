@@ -29,6 +29,7 @@ chromePath = shutil.which('chromedriver')
 options = webdriver.ChromeOptions()
 if hostname == 'user-Vostro-260':
     options.add_argument('headless')
+    options.add_argument('window-size=1200x600')
 driver = webdriver.Chrome(chromePath, chrome_options=options)
 
 
