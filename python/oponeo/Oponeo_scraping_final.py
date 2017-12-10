@@ -10,14 +10,13 @@ from time import sleep
 import re
 import datetime
 import os
-import sys
 import platform
 import shutil
 
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.support.ui import Select
+# from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.action_chains import ActionChains
 
 
@@ -100,7 +99,7 @@ def getproductsFromPage(listaOpon,dzis):
                 delivery=re.search('(?<=<strong>).*? dzień roboczy(?=.*?<\/strong>)', str(prod).replace("\n", "")).group(0)
             elif str(prod).find('dni robocz') != -1:
                 try:
-               	    delivery=re.search('(?<=<strong class=\"\">).*? dni robocz(?=.*?<\/strong>)', str(prod).replace("\n", "")).group(0)
+                    delivery=re.search('(?<=<strong class=\"\">).*? dni robocz(?=.*?<\/strong>)', str(prod).replace("\n", "")).group(0)
                 except:
                     delivery=re.search('(?<=<strong>).*? dni robocz(?=.*?<\/strong>)', str(prod).replace("\n", "")).group(0)
             elif str(prod).find('<strong class=" futureSupply">') != -1:
@@ -241,7 +240,7 @@ for i in rozmiaryOpon1:
 #     if '__OTHER__' not in i and '-' not in i:
     if '__OTHER__' not in i:
         try:
-             getproductsFromPage1(listaOpon,i,dzis,rozmiarySpecjalne)
+            getproductsFromPage1(listaOpon,i,dzis,rozmiarySpecjalne)
         except:
             print("Nie udało się pobrać danych dla", i)
 # listaOpon
