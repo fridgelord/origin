@@ -24,9 +24,15 @@ from selenium import webdriver
 
 print('b')
 
-def isLISI(string):
+ef isLISI(string):
+    if string == '':
+        return False
     string = string.strip()
-    return re.search('\d\d\d?/?\d?\d?\d?\D', string).group(0) == string
+    try:
+        LISI = re.search('\d\d\d?/?\d?\d?\d?\D', string).group(0)
+    except:
+        LISI = ''
+    return LISI == string
 
 def err(gdzie, dla_czego=''):
     print('BLAD', sys.exc_info(), 'W DZIALANIU', gdzie,
@@ -47,6 +53,7 @@ SIdict = {'M': 'T'
           ,'Y': 'Y'
           ,'Z': 'Z'
           ,'': '_n/a'
+          ,'_n/a': '_n/a'
          }
 
 
@@ -194,8 +201,8 @@ now = datetime.datetime.now()
 dzis = now.isoformat()[:10]
 adresPocz = 'https://oponafelga.pl/szukaj/?marka=&rozmiar=&sezon='
 adresKonc = '&pojazd=#results'
-# sezony = ['zimowe', 'letnie', 'caloroczne'] 
-sezony = ['caloroczne'] # dev
+sezony = ['zimowe', 'letnie', 'caloroczne'] 
+# sezony = ['caloroczne'] # dev
 for i in sezony:
     adres = adresPocz+i+adresKonc
     try:
@@ -241,8 +248,8 @@ except:
     biezacaBazaOpon = []
     print ('brak bazy opon, tworze nowa')
 daneOpon = []
-# for referencja in listaOpon:
-for referencja in [['/opona/hankook_kinergy_eco_53960.html']]:
+for referencja in listaOpon:
+# for referencja in [['/opona/hankook_kinergy_eco_53960.html']]:
     odnosnik = referencja[0]
     if odnosnik not in biezacaBazaOpon:
         try:
