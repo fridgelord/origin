@@ -97,7 +97,8 @@ def getproductsFromPage(listaOpon,dzis):
             elif str(prod).find('Doręczymy') != -1:
                 delivery=re.search('(?<=Doręczymy  <strong>).*?(?=<\/strong>)', str(prod).replace("\n", "")).group(0)
             elif str(prod).find('dzień roboczy') != -1:
-                delivery=re.search('(?<=<strong>).*? dzień roboczy(?=.*?<\/strong>)', str(prod).replace("\n", "")).group(0)
+                delivery = re.search('<div class=\"delivery\">.*<strong>(.*dzień roboczy)</strong>', str(prod).replace('\n', '')).group(1)
+                # delivery=re.search('(?<=<strong>).*? dzień roboczy(?=.*?<\/strong>)', str(prod).replace("\n", "")).group(0)
             elif str(prod).find('dni robocz') != -1:
                 try:
                	    delivery=re.search('(?<=<strong class=\"\">).*? dni robocz(?=.*?<\/strong>)', str(prod).replace("\n", "")).group(0)
