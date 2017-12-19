@@ -204,14 +204,9 @@ def getproductsFromPage(pricesOpList,dzis,tireDataOpList):
             except:
                 # print('brak dB', link)
                 dB = '_n/a'
-            try:
-                XL = re.search('<span class=\"extra\">\s*<em>(.*?)</em>',str(prod)).group(1)
-                if XL == 'XL':
-                    XL = True
-                else:
-                    XL = False
-                    print('sprawdz nowy rodzaj XL', XL, 'dla', link)
-            except:
+            if str(prod).find('<em>XL</em>') != -1:
+                XL = True
+            else:
                 XL = False
             application = '_n/a'
             tireType = '_n/a'
