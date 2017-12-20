@@ -347,10 +347,10 @@ tireDataOp = pd.DataFrame(tireDataOpList
                                      ,'runFlat','addFeature','XL','DOT'
                                      ,'tier','country','dateRetrieved'])
 
-sciezka='dev_datasets/pricesOp.csv'
-sciezka2='/mnt/dev/scraping/pricesOp.csv'
-sciezka3='dev_datasets/tireDataOp.csv'
-sciezka4='/mnt/dev/scraping/tireDataOp.csv'
+sciezka='datasets/pricesOp.csv'
+sciezka2='/mnt/scraping/pricesOp.csv'
+sciezka3='datasets/tireDataOp.csv'
+sciezka4='/mnt/scraping/tireDataOp.csv'
 
 zapisz(pricesOp, sciezka)
 zapisz(pricesOp, sciezka2)
