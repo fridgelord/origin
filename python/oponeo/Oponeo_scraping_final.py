@@ -169,7 +169,7 @@ def getproductsFromPage(pricesOpList,dzis,tireDataOpList):
                 DOT = ''
             else:
                 try:
-                    DOT = re.search('div class=\"dot\">\s*?Produkcja\s(\d+?/?\d*?)\s*?<', str(prod).replace('\n', '')).group(1)
+                    DOT = re.search('div class=\"dot\">\s*?Produkcja\s(\d+?\/?\d*?)\s*?<', str(prod).replace('\n', '')).group(1)
                 except:
                     try:
                         DOT = re.search('div class=\"dot\">(.*?)<', str(prod).replace('\n', '')).group(1)
