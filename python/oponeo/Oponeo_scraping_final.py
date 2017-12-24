@@ -6,11 +6,23 @@ import datetime
 import os
 import platform
 import shutil
-import sys
+# import sys
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.action_chains import ActionChains
+import logging
+
+
+
+logging.basicConfig(
+                    level=logging.INFO
+                    , format='%(levelname)s|%(asctime)s|%(message)s'
+                    , datefmt='%Y-%m-%d %H:%M'
+                   )
+logging.getLogger(__name__)
+
+logging.info('starting')
 
 
 hostname = platform.node()
@@ -21,9 +33,6 @@ if hostname == 'user-Vostro-260':
     options.add_argument('window-size=1200x600')
 driver = webdriver.Chrome(chromePath, chrome_options=options)
 
-def err(gdzie, dla_czego=''):
-    print('BLAD', sys.exc_info(), 'W DZIALANIU', gdzie,
-          ('DLA', dla_czego) if dla_czego != '' else '')
 
 SIdict = {'M': 'T'
           ,'J': 'T'
@@ -67,7 +76,7 @@ def zapisz(df, sciezka):
         else:
             df.to_csv(sciezka,sep=';',decimal=',')
     except:
-        print('nie udalo sie zapisac w', sciezka)
+        logging.warning('nie udalo sie zapisac w', sciezka)
 
 
 def getproductsFromPage(pricesOpList,dzis,tireDataOpList):
@@ -78,20 +87,25 @@ def getproductsFromPage(pricesOpList,dzis,tireDataOpList):
     soup = BeautifulSoup(pageSource, 'html.parser')
     products = soup.findAll(True, {'class': 'product'})
     for prod in products:
-        if('class="productName"' in str(prod)):
+        prod = str(prod).replace('\n', '')
+        if('class="productName"' in prod):
             try:
-                title = re.search('(?<=\" title=\")(.*?)(?=\">)', str(prod).replace("\n", "")).group(0)
+                title = re.search('(?<=\" title=\")(.*?)(?=\">)', prod).group(0)
             except:
                 title = '_n/a'
             try:
-                stock = int(re.search('\d+',re.search('(?<=class=\"stockLevel\">)(.*?)(?=w mag)', str(prod).replace("\n", "")).group(0)).group(0))
+                link = re.search('(?<=<a href=\")(.*?)(?=\" title)', prod).group(0)
+            except:
+                link = '_n/a'
+                logging.error('sprawdz brak linka {}'.format(title))
+                raise
+            try:
+                stock = int(re.search('\d+',re.search('(?<=class=\"stockLevel\">)(.*?)(?=w mag)', prod).group(0)).group(0))
             except:
                 stock=0
-            runFlat=False
-            if str(prod).find('Run Flat') != -1:
-                runFlat=True
+            runFlat = 'Run Flat' in prod
             try:
-                LI = re.search('(?<=Indeks nośności )(.*?)(?= – maksymalne)', str(prod).replace("\n", "")).group(0)
+                LI = re.search('(?<=Indeks nośności )(.*?)(?= – maksymalne)', prod).group(0)
             except:
                 LI = '_n/a'
             try:
@@ -99,112 +113,105 @@ def getproductsFromPage(pricesOpList,dzis,tireDataOpList):
             except:
                 LIeu = ''
             try:
-                SI = re.search('(?<=Indeks prędkości )(.*?)(?= – maksymalna)', str(prod).replace("\n", "")).group(0)
+                SI = re.search('(?<=Indeks prędkości )(.*?)(?= – maksymalna)', prod).group(0)
             except:
                 SI = '_n/a'
             try:
                 SIeu = SIdict[SI]
             except:
+                logging.error('brak {} w slowniku SI dla {}'.format(SI, link))
                 SIeu = ''
-            if str(prod).find('<span class="tooltip">Opona letnia z homologacją zimową.</span>') != -1:
+            if prod.find('<span class="tooltip">Opona letnia z homologacją zimową.</span>') != -1:
                 season="allseason"
-            elif str(prod).find('<span class="tooltip">Opona na sezon letni.</span>') != -1:
+            elif prod.find('<span class="tooltip">Opona na sezon letni.</span>') != -1:
                 season="summer"
-            elif str(prod).find('<span class="tooltip">Opona na sezon zimowy.</span>') != -1:
+            elif prod.find('<span class="tooltip">Opona na sezon zimowy.</span>') != -1:
                 season="winter"
-            elif str(prod).find('<span class="tooltip">Opona całoroczna.</span>') != -1:
+            elif prod.find('<span class="tooltip">Opona całoroczna.</span>') != -1:
                 season="allseason"
             else:
                 season="nieznany"
-                print("sprawdz nowy rodzaj sezonu", title)
-            if str(prod).find('<strong>24h</strong>') != -1:
+                logging.warning('sprawdz nowy rodzaj sezonu dla {}'.format(link))
+            if prod.find('<strong>24h</strong>') != -1:
                 delivery='24h'
-            elif str(prod).find('<strong>już jutro!</strong>') != -1:
+            elif prod.find('<strong>już jutro!</strong>') != -1:
                 delivery='24h'
-            elif str(prod).find('Zapytaj o termin dostawy') != -1:
+            elif prod.find('Zapytaj o termin dostawy') != -1:
                 delivery='ask'
-            elif str(prod).find('Doręczymy') != -1:
-                delivery=re.search('(?<=Doręczymy  <strong>).*?(?=<\/strong>)', str(prod).replace("\n", "")).group(0)
-            elif str(prod).find('dzień roboczy') != -1:
-                delivery=re.search('(?<=<strong>).*? dzień roboczy(?=.*?<\/strong>)', str(prod).replace("\n", "")).group(0)
-            elif str(prod).find('dni robocz') != -1:
+            elif prod.find('Doręczymy') != -1:
+                delivery=re.search('(?<=Doręczymy  <strong>).*?(?=<\/strong>)', prod).group(0)
+            elif prod.find('dzień roboczy') != -1:
+                delivery=re.search('(?<=<strong>).*? dzień roboczy(?=.*?<\/strong>)', prod).group(0)
+            elif prod.find('dni robocz') != -1:
                 try:
-                    delivery=re.search('(?<=<strong class=\"\">).*? dni robocz(?=.*?<\/strong>)', str(prod).replace("\n", "")).group(0)
+                    delivery=re.search('(?<=<strong class=\"\">).*? dni robocz(?=.*?<\/strong>)', prod).group(0)
                 except:
-                    delivery=re.search('(?<=<strong>).*? dni robocz(?=.*?<\/strong>)', str(prod).replace("\n", "")).group(0)
-            elif str(prod).find('<strong class=" futureSupply">') != -1:
-                delivery=re.search('(?<=<strong class=\" futureSupply\">).*?(?=<\/strong>)', str(prod).replace("\n", "")).group(0)
+                    delivery=re.search('(?<=<strong>).*? dni robocz(?=.*?<\/strong>)', prod).group(0)
+            elif prod.find('<strong class=" futureSupply">') != -1:
+                delivery=re.search('(?<=<strong class=\" futureSupply\">).*?(?=<\/strong>)', prod).group(0)
             else:
                 delivery="nieznany"
-                print("sprawdz nowy rodzaj dostawy", title)
+                logging.warning('sprawdz nowy rodzaj dostawy dla {}'.format(link))
             try:
-                price = re.search('(?<=<span class=\"price size-[0-9]\">)(.*?)(?=</span>)', str(prod).replace("\n", "")).group(0)
+                price = re.search('(?<=<span class=\"price size-[0-9]\">)(.*?)(?=</span>)', prod).group(0)
                 price = price.replace(chr(160),'')
                 price = int(price)
             except:
                 price = np.nan
-                print("sprawdz brak ceny", title)
+                logging.error('sprawdz brak ceny dla {}'.format(link))
             try:
-                link = re.search('(?<=<a href=\")(.*?)(?=\" title)', str(prod).replace("\n", "")).group(0)
-            except:
-                link = '_n/a'
-                print("sprawdz brak linka", title)
-            try:
-                producer = re.search('(?<=<span class=\"producer\">)(.*?)(?=</span>)', str(prod).replace("\n", "")).group(0)
+                producer = re.search('(?<=<span class=\"producer\">)(.*?)(?=</span>)', prod).group(0)
             except:
                 producer = '_n/a'
-                print("sprawdz brak producenta", title)
+                logging.warning('sprawdz brak producenta dla {}'.format(link))
             try:
-                model = re.search('(?<=<span class=\"model\">)(.*?)(?=</span>)', str(prod).replace("\n", "")).group(0)
+                model = re.search('(?<=<span class=\"model\">)(.*?)(?=</span>)', prod).group(0)
             except:
                 model = '_n/a'
-                print("sprawdz brak modelu", title)
+                logging.warning('sprawdz brak modelu dla {}'.format(link))
             try:
-                size = re.search('(?<=<span class=\"size\">)(.*?)(?=</span>)', str(prod).replace("\n", "")).group(0)
+                size = re.search('(?<=<span class=\"size\">)(.*?)(?=</span>)', prod).group(0)
             except:
                 size = '_n/a'
-                print("sprawdz brak rozmiaru", title)
+                logging.warning('sprawdz brak rozmiaru dostawy dla {}'.format(link))
             width, profile, seat = widthProfileSeatFromSize(size)
-            if str(prod).find('div class=\"dot\"') == -1:
+            if prod.find('div class=\"dot\"') == -1:
                 DOT = ''
             else:
                 try:
-                    DOT = re.search('div class=\"dot\">\s*?Produkcja\s(\d+?\/?\d*?)\s*?<', str(prod).replace('\n', '')).group(1)
+                    DOT = re.search('div class=\"dot\">\s*?Produkcja\s(\d+?\/?\d*?)\s*?<', prod).group(1)
                 except:
                     try:
-                        DOT = re.search('div class=\"dot\">(.*?)<', str(prod).replace('\n', '')).group(1)
+                        DOT = re.search('div class=\"dot\">(.*?)<', prod).group(1)
                         if DOT.strip() != '':
-                            print('sprawdz inny format dotu:', DOT, link)
+                            logging.warning('sprawdz nowy format DOTU: {} dla {}'.format(DOT, link))
                             raise
                     except:
                         pass
                 DOT = ''
             try:
-                country = re.search('span class=\"country\">(.*?)</span>', str(prod).replace('\n', '')).group(1)
+                country = re.search('span class=\"country\">(.*?)</span>', prod).group(1)
             except:
                 country = ''
             try:
                 RR = re.search('span class=\"icon-fuel\">'+
                                '\s*</span>\s*<em>\s*(\w)\s*<span>',
-                               str(prod)).group(1)
+                               prod).group(1)
             except:
-                # print('brak RR', link)
                 RR = '_n/a'
             try:
                 WG = re.search('span class=\"icon-rain\">'+
                                '\s*</span>\s*<em>\s*(\w)\s*<span>',
-                               str(prod)).group(1)
+                               prod).group(1)
             except:
-                # print('brak WG', link)
                 WG = '_n/a'
             try:
                 dB = re.search('<span class=\"icon-noise\">'+
                                '\s*</span>\s*<em>\s*(\d\d)dB\s*?</em>',
-                               str(prod)).group(1)
+                               prod).group(1)
             except:
-                # print('brak dB', link)
                 dB = '_n/a'
-            if str(prod).find('<em>XL</em>') != -1:
+            if prod.find('<em>XL</em>') != -1:
                 XL = True
             else:
                 XL = False
@@ -257,7 +264,7 @@ def getproductsFromPage(pricesOpList,dzis,tireDataOpList):
                                 dzis
                 ])
             except:
-                err('dodawanie do listy', link)
+                logging.error('problem z dodawaniem do listy dla {}'.format(link))
     try:
         try:
             close = driver.find_elements_by_xpath("//*[contains(text(), 'Zamknij i nie pokazuj')]")[0]
@@ -287,28 +294,27 @@ def getproductsFromPage1(pricesOpList,rozmiar,dzis,rozmiarySpecjalne,tireDataOpL
     try:
         driver.get(adres)
     except:
-        print("Nie udało się otworzyć strony dla", rozmiar)
+        logging.error('nie udalo sie otworzyc strony dla {}'.format(rozmiar))
     sleep(3)
     try:
         szer=Select(driver.find_element_by_id("_ctTS_ddlDimWidth")).all_selected_options[0].text
     except:
-        print("nie udalo sie sprawdzic szer dla", rozmiar)
         raise
     else:
         if szer != rozmiar[1]: 
-            print("rozmiar", rozmiar, "niepoprawny")
+            logging.error('rozmiar {} niepoprawny'.format(rozmiar))
             raise
     try:
         driver.find_element_by_id("_ctTS_inpPF").clear()
         driver.find_element_by_id("_ctTS_inpPF").send_keys("0" + "\n")
     except:
-        print("Nie udało się wpisać min ceny dla", rozmiar)
+        logging.error('nie udalo sie wpisac min ceny dla'.format(rozmiar))
     sleep(3)
     try:
         driver.find_element_by_id("_ctTS_inpPT").clear()
         driver.find_element_by_id("_ctTS_inpPT").send_keys("100000" + "\n")
     except:
-        print("Nie udało się wpisać max ceny dla", rozmiar)
+        logging.error('nie udalo sie wpisac max ceny dla'.format(rozmiar))
     sleep(3)
     getproductsFromPage(pricesOpList,dzis,tireDataOpList)
 
@@ -322,16 +328,13 @@ rozmiaryOpon = pd.read_csv('datasets/typy_opon.csv',dtype='str')
 rozmiarySpecjalne = pd.read_csv('datasets/rozmiary_specjalne.csv',dtype='str',header=None)
 rozmiarySpecjalne = dict(rozmiarySpecjalne.values)
 rozmiaryOpon1 = rozmiaryOpon.values.tolist()
-#rozmiaryOpon1 = [['0','195','55','16'],['1','255','50','18']] #test
-# rozmiaryOpon1 = [['1','125','80','12']] #test
-# rozmiaryOpon1 = [['1','135','70','15']] #test
-# rozmiaryOpon1 = [['0','33','13.50','16']] #test
+# rozmiaryOpon1 = [['0','195','55','16'],['1','255','50','18']] #dev
 for i in rozmiaryOpon1:
     if '__OTHER__' not in i:
         try:
             getproductsFromPage1(pricesOpList,i,dzis,rozmiarySpecjalne,tireDataOpList)
         except:
-            print("Nie udało się pobrać danych dla", i)
+            logging.error('nie udało się pobrać danych dla'.format(i))
 
 
 driver.quit()
@@ -356,3 +359,5 @@ zapisz(pricesOp, sciezka)
 zapisz(pricesOp, sciezka2)
 zapisz(tireDataOp, sciezka3)
 zapisz(tireDataOp, sciezka4)
+
+logging.info('finishing\n\n')
