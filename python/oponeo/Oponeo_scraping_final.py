@@ -83,7 +83,7 @@ def zapisz(df, sciezka):
         logging.warning('nie udalo sie zapisac w', sciezka)
 
 
-def getproductsFromPage(pricesOpList,dzis,tireDataOpList):
+def getproductsFromPage(pricesOpList,dzis,tireDataOpList,biezacaBazaOpon):
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     sleep(2)
     pageSource = driver.page_source
@@ -237,36 +237,37 @@ def getproductsFromPage(pricesOpList,dzis,tireDataOpList):
                                 stock,
                                 dzis
                                 ])
-                tireDataOpList.append([
-                                link,
-                                width,
-                                profile,
-                                seat,
-                                LI,
-                                LIeu,
-                                SI,
-                                SIeu,
-                                season,
-                                model,
-                                application,
-                                tireType,
-                                RR,
-                                WG,
-                                dB,
-                                noise,
-                                producer,
-                                manuf_code,
-                                EAN,
-                                ICindex,
-                                RBP,
-                                runFlat,
-                                addFeature,
-                                XL,
-                                DOT,
-                                tier,
-                                country,
-                                dzis
-                ])
+                if link not in biezacaBazaOpon['link']:
+                    tireDataOpList.append([
+                                    link,
+                                    width,
+                                    profile,
+                                    seat,
+                                    LI,
+                                    LIeu,
+                                    SI,
+                                    SIeu,
+                                    season,
+                                    model,
+                                    application,
+                                    tireType,
+                                    RR,
+                                    WG,
+                                    dB,
+                                    noise,
+                                    producer,
+                                    manuf_code,
+                                    EAN,
+                                    ICindex,
+                                    RBP,
+                                    runFlat,
+                                    addFeature,
+                                    XL,
+                                    DOT,
+                                    tier,
+                                    country,
+                                    dzis
+                        ])
             except:
                 logging.error('problem z dodawaniem do listy dla {}'.format(link))
     try:
@@ -289,7 +290,7 @@ def getproductsFromPage(pricesOpList,dzis,tireDataOpList):
         getproductsFromPage(pricesOpList,dzis,tireDataOpList)
 
 
-def getproductsFromPage1(pricesOpList,rozmiar,dzis,rozmiarySpecjalne,tireDataOpList):
+def getproductsFromPage1(pricesOpList,rozmiar,dzis,rozmiarySpecjalne,tireDataOpList,biezacaBazaOpon):
     rozmiar1=rozmiar[1]+'-'+rozmiar[2]+'-r'+rozmiar[3]
     rozmiar1=rozmiar1.replace('.','-')
     if rozmiar1 in rozmiarySpecjalne:
@@ -320,7 +321,7 @@ def getproductsFromPage1(pricesOpList,rozmiar,dzis,rozmiarySpecjalne,tireDataOpL
     except:
         logging.error('nie udalo sie wpisac max ceny dla'.format(rozmiar))
     sleep(3)
-    getproductsFromPage(pricesOpList,dzis,tireDataOpList)
+    getproductsFromPage(pricesOpList,dzis,tireDataOpList,biezacaBazaOpon)
 
 
 
@@ -330,13 +331,19 @@ now = datetime.datetime.now()
 dzis = now.isoformat()[:10]
 rozmiaryOpon = pd.read_csv('datasets/typy_opon.csv',dtype='str')
 rozmiarySpecjalne = pd.read_csv('datasets/rozmiary_specjalne.csv',dtype='str',header=None)
+try:
+    biezacaBazaOpon = pd.read_csv('datasets/tireDataOp.csv', dtype='str', sep=';')
+except:
+    biezacaBazaOpon = []
+    print('brak bazy opon, tworze nowa')
+
 rozmiarySpecjalne = dict(rozmiarySpecjalne.values)
 rozmiaryOpon1 = rozmiaryOpon.values.tolist()
 # rozmiaryOpon1 = [['0','195','55','16'],['1','255','50','18']] #dev
 for i in rozmiaryOpon1:
     if '__OTHER__' not in i:
         try:
-            getproductsFromPage1(pricesOpList,i,dzis,rozmiarySpecjalne,tireDataOpList)
+            getproductsFromPage1(pricesOpList,i,dzis,rozmiarySpecjalne,tireDataOpList, biezacaBazaOpon)
         except:
             logging.error('nie udało się pobrać danych dla'.format(i))
 
@@ -356,8 +363,12 @@ tireDataOp = pd.DataFrame(tireDataOpList
 
 sciezka='datasets/pricesOp.csv'
 sciezka2='/mnt/scraping/pricesOp.csv'
-sciezka3='datasets/tireDataOp.csv'
-sciezka4='/mnt/scraping/tireDataOp.csv'
+if biezacaBazaOpon.isempty():
+    tDOname = 'tireDataOp.csv'
+else:
+    tDOname = 'tireDataOpNew.csv'
+sciezka3='datasets/' + tDOname
+sciezka4='/mnt/scraping' + tDOname
 
 zapisz(pricesOp, sciezka)
 zapisz(pricesOp, sciezka2)
