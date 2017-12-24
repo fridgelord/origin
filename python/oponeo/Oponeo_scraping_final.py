@@ -14,13 +14,17 @@ from selenium.webdriver.common.action_chains import ActionChains
 import logging
 
 
+cur_path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(cur_path)
 
+logging.getLogger(__name__)
 logging.basicConfig(
                     level=logging.INFO
-                    , format='%(levelname)s|%(asctime)s|%(message)s'
+                    , format='%(name)s|%(levelname)s|%(asctime)s|%(message)s'
                     , datefmt='%Y-%m-%d %H:%M'
+                    # , logger = __name__
                    )
-logging.getLogger(__name__)
+
 
 logging.info('starting')
 
