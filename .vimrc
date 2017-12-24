@@ -8,6 +8,14 @@ call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
 
+Plugin 'rainbow_parentheses.vim'
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
+
+Plugin 'bronson/vim-visual-star-search'
+
 Plugin 'vim-scripts/indentpython.vim'
 let g:SimpylFold_docstring_preview=1 " see the docstrings for folded code
 
@@ -16,10 +24,10 @@ Plugin 'nvie/vim-flake8' "pep8 check
 "Plugin 'scrooloose/syntastic' "syntax check
 
 Plugin 'w0rp/ale' "syntax chech in the fly
-let g:ale_sign_column_always = 0
+let g:ale_sign_column_always = 1
 let g:ale_change_sign_column_color = 1
-let g:ale_lint_on_text_changed='normal'
-let g:ale_python_flake8_args = '--ignore=E115,E124,E2,E3,E5,E722'
+" let g:ale_lint_on_text_changed='normal'
+let g:ale_python_flake8_args = '--ignore=E115,E124,E126,E128,E2,E3,E5,E722,W291'
 
 
 Plugin 'scrooloose/nerdtree' "file tree
@@ -35,6 +43,10 @@ set diffopt+=vertical
 Plugin 'tmhedberg/SimpylFold'
 
 Plugin 'Raimondi/delimitMate'
+let delimitMate_expand_cr = 2
+let delimitMate_jump_expansion = 1
+
+" Plugin 'jiangmiao/auto-pairs'
 
 Plugin 'thinca/vim-quickrun'
 let g:quickrun_config = {
@@ -43,13 +55,13 @@ let g:quickrun_config = {
 nnoremap <silent> <F5> :QuickRun python3<CR>
 vnoremap <silent> <F5> :QuickRun python3<CR>
 
-" Bundle 'Valloric/YouCompleteMe'
-" let g:ycm_python_binary_path = '/usr/bin/python3'
-" let g:ycm_autoclose_preview_window_after_completion=1
-" map <leader>g  :YcmCompleter GoToDefinition<CR>
-" map <leader>d  :YcmCompleter GetDoc<CR>
+Bundle 'Valloric/YouCompleteMe'
+let g:ycm_python_binary_path = '/usr/bin/python3'
+let g:ycm_autoclose_preview_window_after_completion=1
+map <leader>g  :YcmCompleter GoToDefinition<CR>
+map <leader>d  :YcmCompleter GetDoc<CR>
 "
-Plugin 'davidhalter/jedi-vim'
+" Plugin 'davidhalter/jedi-vim'
 
 " Plugin 'python-mode/python-mode'
 " let g:pymode_python = 'python3'
